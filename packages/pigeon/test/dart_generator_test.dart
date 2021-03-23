@@ -26,7 +26,7 @@ void main() {
     generateDart(DartOptions(isNullSafe: false), root, sink);
     final String code = sink.toString();
     expect(code, contains('class Foobar'));
-    expect(code, contains('  dataType1 field1;'));
+    expect(code, contains('  dataType1? field1;'));
   });
 
   test('gen one host api', () {
@@ -71,13 +71,13 @@ void main() {
     expect(
       code,
       contains(
-        'pigeonMap[\'nested\'] = nested == null ? null : nested.encode()',
+        'pigeonMap[\'nested\'] = nested == null ? null : nested!.encode()',
       ),
     );
     expect(
       code.replaceAll('\n', ' ').replaceAll('  ', ''),
       contains(
-        '..nested = pigeonMap[\'nested\'] != null ? Input.decode(pigeonMap[\'nested\']) : null;',
+        '..nested = pigeonMap[\'nested\'] != null ? Input.decode(pigeonMap[\'nested\']!) : null;',
       ),
     );
   });
@@ -244,7 +244,7 @@ void main() {
     expect(testCode, contains('abstract class ApiMock'));
     expect(testCode, isNot(contains('.ApiMock.doSomething')));
     expect(testCode, contains('\'${Keys.result}\': output.encode()'));
-    expect(testCode, contains('return <Object, Object>{};'));
+    expect(testCode, contains('return <Object?, Object?>{};'));
   });
 
   test('opt out of nndb', () {
