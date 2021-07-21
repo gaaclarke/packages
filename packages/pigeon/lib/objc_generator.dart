@@ -92,9 +92,9 @@ const Map<String, String> _propertyTypeForDartTypeMap = <String, String>{
   'Map': 'strong',
 };
 
-String? _objcTypeForPrimitiveDartType(String type) {
-  return _objcTypeForDartTypeMap.containsKey(type)
-      ? '${_objcTypeForDartTypeMap[type]} *'
+String? _objcTypeForPrimitiveDartType(Field field) {
+  return _objcTypeForDartTypeMap.containsKey(field.dataType)
+      ? '${_objcTypeForDartTypeMap[field.dataType]} *'
       : null;
 }
 
