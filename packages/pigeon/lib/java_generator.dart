@@ -121,12 +121,12 @@ void _writeHostApi(Indent indent, Api api) {
   indent.write('public interface ${api.name} ');
   indent.scoped('{', '}', () {
     for (final Method method in api.methods) {
-      final String argType = _boxedType(method.argType);
+      final String argType = _boxedType(method.argType.dataType);
       final String returnType = method.isAsynchronous
           ? 'void'
           : _boxedType(method.returnType.dataType);
       final List<String> argSignature = <String>[];
-      if (method.argType != 'void') {
+      if (method.argType.dataType != 'void') {
         argSignature.add('$argType arg');
       }
       if (method.isAsynchronous) {
@@ -165,7 +165,7 @@ static MessageCodec<Object> getCodec() {
           indent.scoped('{', '} else {', () {
             indent.write('channel.setMessageHandler((message, reply) -> ');
             indent.scoped('{', '});', () {
-              final String argType = _boxedType(method.argType);
+              final String argType = _boxedType(method.argType.dataType);
               final String returnType = _boxedType(method.returnType.dataType);
               indent.writeln('Map<String, Object> wrapped = new HashMap<>();');
               indent.write('try ');
@@ -251,9 +251,9 @@ static MessageCodec<Object> getCodec() {
       final String returnType = func.returnType.dataType == 'void'
           ? 'Void'
           : _boxedType(func.returnType.dataType);
-      final String argType = _boxedType(func.argType);
+      final String argType = _boxedType(func.argType.dataType);
       String sendArgument;
-      if (func.argType == 'void') {
+      if (func.argType.dataType == 'void') {
         indent.write('public void ${func.name}(Reply<$returnType> callback) ');
         sendArgument = 'null';
       } else {
