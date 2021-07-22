@@ -122,15 +122,17 @@ void _writeHostApi(Indent indent, Api api) {
   indent.scoped('{', '}', () {
     for (final Method method in api.methods) {
       final String argType = _boxedType(method.argType);
-      final String returnType =
-          method.isAsynchronous ? 'void' : _boxedType(method.returnType);
+      final String returnType = method.isAsynchronous
+          ? 'void'
+          : _boxedType(method.returnType.dataType);
       final List<String> argSignature = <String>[];
       if (method.argType != 'void') {
         argSignature.add('$argType arg');
       }
       if (method.isAsynchronous) {
-        final String returnType =
-            method.returnType == 'void' ? 'Void' : method.returnType;
+        final String returnType = method.returnType.dataType == 'void'
+            ? 'Void'
+            : method.returnType.dataType;
         argSignature.add('Result<$returnType> result');
       }
       indent.writeln('$returnType ${method.name}(${argSignature.join(', ')});');
@@ -164,7 +166,7 @@ static MessageCodec<Object> getCodec() {
             indent.write('channel.setMessageHandler((message, reply) -> ');
             indent.scoped('{', '});', () {
               final String argType = _boxedType(method.argType);
-              final String returnType = _boxedType(method.returnType);
+              final String returnType = _boxedType(method.returnType.dataType);
               indent.writeln('Map<String, Object> wrapped = new HashMap<>();');
               indent.write('try ');
               indent.scoped('{', '}', () {
@@ -181,7 +183,7 @@ static MessageCodec<Object> getCodec() {
                 }
                 if (method.isAsynchronous) {
                   final String resultValue =
-                      method.returnType == 'void' ? 'null' : 'result';
+                      method.returnType.dataType == 'void' ? 'null' : 'result';
                   methodArgument.add(
                     'result -> { '
                     'wrapped.put("${Keys.result}", $resultValue); '
@@ -193,7 +195,7 @@ static MessageCodec<Object> getCodec() {
                     'api.${method.name}(${methodArgument.join(', ')})';
                 if (method.isAsynchronous) {
                   indent.writeln('$call;');
-                } else if (method.returnType == 'void') {
+                } else if (method.returnType.dataType == 'void') {
                   indent.writeln('$call;');
                   indent.writeln('wrapped.put("${Keys.result}", null);');
                 } else {
@@ -246,8 +248,9 @@ static MessageCodec<Object> getCodec() {
 ''');
     for (final Method func in api.methods) {
       final String channelName = makeChannelName(api, func);
-      final String returnType =
-          func.returnType == 'void' ? 'Void' : _boxedType(func.returnType);
+      final String returnType = func.returnType.dataType == 'void'
+          ? 'Void'
+          : _boxedType(func.returnType.dataType);
       final String argType = _boxedType(func.argType);
       String sendArgument;
       if (func.argType == 'void') {
@@ -268,7 +271,7 @@ static MessageCodec<Object> getCodec() {
         indent.dec();
         indent.write('channel.send($sendArgument, channelReply -> ');
         indent.scoped('{', '});', () {
-          if (func.returnType == 'void') {
+          if (func.returnType.dataType == 'void') {
             indent.writeln('callback.reply(null);');
           } else {
             indent.writeln('@SuppressWarnings("ConstantConditions")');
